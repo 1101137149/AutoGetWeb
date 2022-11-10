@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
 import time
 
@@ -7,30 +8,61 @@ def web():
     try:
         global driver
         driver = webdriver.Chrome()#'./chromedriver'
-        driver.get('https://tixcraft.com/activity/game/22_WuBaiOPR') #進到網站 https://tixcraft.com/activity/game/23_blackpink
+        driver.implicitly_wait(30)  # 隱含等待30秒
         
         
-        # a = driver.find_element_by_name('yt0')
-        # print(a)
-        # driver.find_element_by_name('yt0').click().pause(10) 
-        # driver.find_element_by_xpath("//*[@name=\"yt0\"]").click()
+        
+        #登入
+        driver.get('https://tixcraft.com/login')
+        driver.find_element("id",'loginFacebook').click()
+        account = driver.find_element("id",'email')
+        account.clear()
+        account.send_keys("帳號")
+        password = driver.find_element("id",'pass')
+        password.clear()
+        password.send_keys("密碼")
+        # 按下登入按鈕
+        driver.find_element("id",'loginbutton').click() 
+        
+        
+        #進到網站 https://tixcraft.com/activity/game/23_blackpink
+        driver.get('https://tixcraft.com/activity/game/22_WuBaiOPR') 
+        #找第一個按鈕 立即搶票
         driver.find_element("name",'yt0').click()
-        driver.find_element("id",'11324_1').click()
+        
+        #哪一個座位
+        driver.find_element("id",'11324_1').click() #id_編號
+
+        # 抓取下拉選單元件選取票數
+        select = Select(driver.find_element("id",'TicketForm_ticketPrice_01'))
+        select.select_by_value("2")
 
 
+        #打勾 詳細閱讀
+        driver.find_element("id",'TicketForm_agree').click()
         
-        # driver.find_element(by=BY.)
-        # driver.find_element_by_name('yt0')
-        # print(立即搶票)
+
+        #Focus 驗證碼
+        驗證碼 = driver.find_element("id",'TicketForm_verifyCode')
+        驗證碼.clear()
+        驗證碼.send_keys("")
         
-        #find_element_by_name()
-        # driver.set_window_position(0,0) #瀏覽器位置
-        # driver.set_window_size(700,700) #瀏覽器大小
-        time.sleep(5)
-        driver.quit()
+ 
+        
+        
     except:
-        print("有錯誤嗎")
+        print("有錯誤")
 
-    print("完成")
+    finally:
+
+
+        #登出
+        driver.find_element("id",'logout').click() #登出
+
+        time.sleep(1000)
+        driver.quit()
+    
+    
+    print("完成")    
 
 web()
